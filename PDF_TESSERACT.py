@@ -3,8 +3,7 @@ import cv2
 import pytesseract
 import numpy as np
 from pytesseract import Output
-import re
-from re import finditer
+import TEMP as temp
 
 def has_numbers(inputString):
     return any(char.isdigit() for char in inputString)
@@ -33,33 +32,44 @@ def uprava_jpg(jpg):
     kernel = np.ones((1, 1), np.uint8)
     image = cv2.dilate(image, kernel, iterations=1)
     image = cv2.erode(image, kernel, iterations=1)
+    image=cv2.threshold(cv2.GaussianBlur(image, (5, 5), 0), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
     return(image)
 
+def vypis_txt(text,name):
+    file_text=open("PDF/"+str(name)+".txt","a+",encoding='utf-8')
+    file_text.write(text)
+    file_text.close()
 
 
 def prijata_faktura_txt(name):
     number_pages=pdf_page_number(name)
-    number_pages=1
+    number_pages=2
     for index in range(0,number_pages):
         jpg=create_jpg(name,index)
         jpg_upravene=uprava_jpg(jpg)
         my_config=r'--oem 3 --psm 6 '
         text = pytesseract.image_to_string(jpg_upravene,lang='ces',config=my_config)
         #only for spyder start#
-        arr = text.split('\n')[0:-1]        
-        text = '\n'.join(arr)
+        # arr = text.split('\n')[0:-1]
+        # text = '\n'.join(arr)
         #only for spyder end#
-        print(text)
-        #print("---------------")
-        #print(f"TXT file - Page number: {index} is DONE")    
+        vypis_txt(text, name)
+        print("---------------")
+        print(f"TXT file - Page number: {index} is DONE")
 
 
    
 
 
 def main():
-    name="faktura1"
-    prijata_faktura_txt(name)
+    #name="faktura1"
+    name="faktury_prijate"
+    text=prijata_faktura_txt(name)
+    file_text = open("PDF/" + str(name) + ".txt", "r", encoding='utf-8')
+    data = file_text.read()
+    info=temp.create_pattern(data)
+    print(info)
 
 
 
