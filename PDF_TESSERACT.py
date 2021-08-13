@@ -42,34 +42,48 @@ def vypis_txt(text,name):
     file_text.close()
 
 
-def prijata_faktura_txt(name):
-    number_pages=pdf_page_number(name)
-    number_pages=2
-    for index in range(0,number_pages):
+def prijata_faktura_txt(name,start,end):
+    open("PDF/"+str(name)+".txt","w",encoding='utf-8').close()    
+    for index in range(start,end):
         jpg=create_jpg(name,index)
         jpg_upravene=uprava_jpg(jpg)
         my_config=r'--oem 3 --psm 6 '
         text = pytesseract.image_to_string(jpg_upravene,lang='ces',config=my_config)
         #only for spyder start#
-        # arr = text.split('\n')[0:-1]
-        # text = '\n'.join(arr)
+        arr = text.split('\n')[0:-1]
+        text = '\n'.join(arr)
         #only for spyder end#
-        vypis_txt(text, name)
+        vypis_txt(text,name)
         print("---------------")
         print(f"TXT file - Page number: {index} is DONE")
 
 
-   
+
+
+def whole_info(data):
+    facture_number=temp.cislo_faktury(data)
+    datums_vystaveni_info=temp.datums_vystaveni(data)
+    datums_splatnosti_info=temp.datums_splatnosti(data)
+    datums_zdaneni_info=temp.datums_zdaneni(data)
+    ico_info=temp.odberatel_dodavatel(data)
+    cost=temp.castka(data)
+    whole_info_dict={**facture_number, **datums_vystaveni_info,**datums_splatnosti_info,**datums_zdaneni_info,**ico_info,**cost}
+    return(whole_info_dict)
 
 
 def main():
     #name="faktura1"
     name="faktury_prijate"
-    text=prijata_faktura_txt(name)
+    start=pdf_page_number(name)
+    start=0
+    end=2
+    prijata_faktura_txt(name,start,end)
     file_text = open("PDF/" + str(name) + ".txt", "r", encoding='utf-8')
     data = file_text.read()
-    info=temp.create_pattern(data)
-    print(info)
+    result=whole_info(data)
+    print(result)
+
+
 
 
 
