@@ -74,9 +74,9 @@ def whole_info(data):
 def main():
     #name="faktura1"
     name="faktury_prijate"
-    start=pdf_page_number(name)
-    start=0
-    end=2
+    end=pdf_page_number(name)
+    start=2
+    end=4
     prijata_faktura_txt(name,start,end)
     file_text = open("PDF/" + str(name) + ".txt", "r", encoding='utf-8')
     data = file_text.read()
